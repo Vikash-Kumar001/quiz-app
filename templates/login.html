@@ -1,7 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Login | Quiz App{% endblock %}
 {% block content %}
-<div class="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
+<div class="w-full max-w-md bg-white rounded-lg shadow-lg p-8 relative">
+    <!-- Close Button -->
+    <button onclick="window.location.href='/'"
+            class="absolute top-3 right-3 text-gray-500 hover:text-red-600 text-2xl font-bold focus:outline-none"
+            aria-label="Close">
+        &times;
+    </button>
+
     <h2 class="text-2xl font-bold mb-6 text-blue-700 text-center">Login</h2>
     <form id="loginForm" class="space-y-4">
         <div>
@@ -26,13 +33,22 @@ document.getElementById('loginForm').onsubmit = async function(e){
     e.preventDefault();
     const username = this.username.value;
     const password = this.password.value;
+
     const resp = await fetch('/login', {
         method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({username, password})
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ username, password })
     });
-    const data = await resp.json();
-    if(data.error){
+
+    let data;
+    try {
+        data = await resp.json();
+    } catch (err) {
+        document.getElementById('loginError').innerText = "Server error. Please try again.";
+        return;
+    }
+
+    if (data.error) {
         document.getElementById('loginError').innerText = data.error;
     } else {
         window.location.href = "/";
